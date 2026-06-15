@@ -1,0 +1,57 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+model Event {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  imageUrl        String
+  venueName       String
+  venueAddress    String?
+  startsAt        DateTime
+  endsAt          DateTime?
+  organiserName   String
+  organiserContact String?
+  status          String   @default("draft") // draft | published | cancelled | sold_out
+  tiers           Tier[]
+  orders          Order[]
+  createdAt       DateTime @default(now())
+}
+
+model Tier {
+  id             String  @id @default(cuid())
+  eventId        String
+  event          Event   @relation(fields: [eventId], references: [id])
+  name           String
+  description    String?
+  priceCents     Int
+  currency       String  @default("SGD")
+  quantityTotal  Int
+  quantitySold   Int     @default(0)
+  orders         Order[]
+}
+
+model Order {
+  id                    String   @id @default(cuid())
+  eventId               String
+  event                 Event    @relation(fields: [eventId], references: [id])
+  tierId                String
+  tier                  Tier     @relation(fields: [tierId], references: [id])
+  buyerName             String
+  buyerEmail            String
+  buyerPhone            String
+  quantity              Int      @default(1)
+  amountCents           Int
+  status                String   @default("pending") // pending | paid | failed | expired
+  hitpayReference       String   @unique
+  hitpayPaymentRequestId String?
+  createdAt             DateTime @default(now())
+  paidAt                DateTime?
+}
