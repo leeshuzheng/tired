@@ -4,6 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import CheckoutForm from "@/components/CheckoutForm";
 
+export const dynamic = "force-dynamic";
+
 export default async function ShowPage({ params }: { params: { id: string } }) {
   const { id } = await params;
 
